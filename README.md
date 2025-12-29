@@ -49,114 +49,41 @@ A comprehensive, production-ready data analysis platform powered by **Streamlit*
 
 ---
 
-## 🚀 Quick Start
+## Getting Started
 
-### Method 1: Automated Setup ⚡
+Follow the steps below to set up and run the project locally.
 
-```bash
-# Linux/Mac
-chmod +x run.sh
-./run.sh
+### 1. Clone the Repository
 
-# Windows
-run.bat
+```
+git clone https://github.com/ikigamisama/Data-Swiss-Knife-with-AI.git
+cd Data-Swiss-Knife-with-AI
 ```
 
-The script will:
+### 2. Install Python Dependencies
 
-- ✅ Create virtual environment
-- ✅ Install dependencies
-- ✅ Check Ollama status
-- ✅ Set up directories
-- ✅ Launch application
+Make sure you have Python installed, then run:
 
----
-
-### Method 2: Manual Setup 🔧
-
-#### 1. Install Ollama
-
-```bash
-# macOS/Linux
-curl https://ollama.ai/install.sh | sh
-
-# Windows
-# Download from https://ollama.ai/download
-
-# Verify
-ollama --version
 ```
-
-#### 2. Pull LLM Model
-
-```bash
-# Start Ollama service
-ollama serve
-
-# In another terminal, pull the model
-ollama pull gpt-oss-120b-cloud
-
-# Alternative models
-ollama pull llama3.1
-ollama pull codellama
-```
-
-#### 3. Setup Project
-
-```bash
-# Clone repository
-git clone https://github.com/yourusername/data-analysis-swiss-knife.git
-cd data-analysis-swiss-knife
-
-# Create virtual environment
-python3 -m venv venv
-
-# Activate
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-#### 4. Configure
+### 3. Install and Configure Ollama
 
-```bash
-# Copy environment template
-cp .env.example .env
+- Install Ollama from the official website
+- Log in to Ollama:
 
-# Edit configuration (optional)
-nano .env
+```
+ollama login
 ```
 
-#### 5. Run
+### 4. Run the Application
 
-```bash
-# Launch Streamlit app
-streamlit run streamlit_app/app.py
+Start the Streamlit app with:
 
-# Or using Make
-make run
 ```
-
-Access at: **http://localhost:8501**
-
----
-
-### Method 3: Docker Setup 🐳
-
-```bash
-# Build and run
-docker-compose up -d
-
-# View logs
-docker-compose logs -f app
-
-# Stop
-docker-compose down
+streamlit run app/Main.py
 ```
-
----
 
 ## 📂 Project Structure
 
