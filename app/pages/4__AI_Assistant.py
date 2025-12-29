@@ -200,13 +200,83 @@ with tab2:
 
     for idx, suggestion in enumerate(suggestions):
         with col1 if idx % 2 == 0 else col2:
-            if st.button(suggestion, key=f"suggest_{idx}", width='stretch'):
-                # Add to chat
+            if st.button(suggestion, key=f"suggest_{idx}", use_container_width=True):
+                # Set the query and switch to chat tab
+                st.session_state.suggested_query = suggestion
+                st.rerun()
+
+    # If a suggestion was clicked, process it in the chat tab
+    if st.session_state.get('suggested_query'):
+        # Switch to chat tab by setting the active tab
+        st.session_state.active_tab = "💬 Chat"
+        # Clear the suggested query flag
+        suggested_query = st.session_state.pop('suggested_query')
+        
+        # Add to chat history and process
+        st.session_state.chat_history.append({
+            'role': 'user',
+            'content': suggested_query
+        })
+        
+        # Generate response for the suggested query
+        with st.spinner("🤔 Thinking..."):
+            try:
+                # Prepare data context
+                df_info = {
+                    'shape': df.shape,
+                    'columns': df.columns.tolist(),
+                    'dtypes': {col: str(dtype) for col, dtype in df.dtypes.items()},
+                    'numeric_columns': numeric_cols,
+                    'categorical_columns': categorical_cols,
+                    'sample_data': df.head(3).to_dict('records')
+                }
+
+                # Generate pandas code
+                code = llm_client.nl_to_pandas(suggested_query, df_info)
+
+                response_message = {
+                    'role': 'assistant',
+                    'content': f"I'll help you with that. Here's the analysis:",
+                    'code': code
+                }
+
+                # Execute code if auto-execute is enabled
+                if auto_execute and code:
+                    try:
+                        # Create execution environment
+                        local_vars = {'df': df, 'pd': pd, 'np': np}
+
+                        # Capture output
+                        output_buffer = io.StringIO()
+                        sys.stdout = output_buffer
+
+                        # Execute code
+                        exec(code, {'__builtins__': __builtins__}, local_vars)
+
+                        # Restore stdout
+                        sys.stdout = sys.__stdout__
+
+                        # Get result
+                        if 'result' in local_vars:
+                            result = local_vars['result']
+                        else:
+                            result = output_buffer.getvalue()
+
+                        response_message['result'] = result
+                        response_message['content'] += "\n\n✅ Code executed successfully!"
+
+                    except Exception as e:
+                        response_message['content'] += f"\n\n⚠️ Execution error: {str(e)}"
+                        response_message['error'] = str(e)
+
+                st.session_state.chat_history.append(response_message)
+
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
                 st.session_state.chat_history.append({
-                    'role': 'user',
-                    'content': suggestion
+                    'role': 'assistant',
+                    'content': f"I encountered an error: {str(e)}\n\nPlease try rephrasing your question."
                 })
-                st.switch_page("pages/4__AI_Assistant.py")
 
 # Tab 3: Code Playground
 with tab3:
